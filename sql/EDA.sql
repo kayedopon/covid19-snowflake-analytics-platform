@@ -1,0 +1,264 @@
+-- table overview
+DESCRIBE TABLE JHU_COVID_19;
+
+SELECT COUNT(*) AS total_rows
+FROM JHU_COVID_19;
+
+SELECT *
+FROM JHU_COVID_19
+LIMIT 10;
+
+
+-- case types
+SELECT DISTINCT CASE_TYPE
+FROM JHU_COVID_19;
+
+SELECT CASE_TYPE, COUNT(*) AS count
+FROM JHU_COVID_19
+GROUP BY CASE_TYPE;
+
+-- descriptive statistics
+SELECT
+    CASE_TYPE,
+    MIN(DIFFERENCE) AS min_difference,
+    MAX(DIFFERENCE) AS max_difference,
+    AVG(DIFFERENCE) AS avg_difference,
+    MEDIAN(DIFFERENCE) AS median_difference,
+    STDDEV(DIFFERENCE) AS std_difference
+FROM JHU_COVID_19
+GROUP BY CASE_TYPE;
+
+-- date range
+SELECT
+    MIN(DATE) AS first_date,
+    MAX(DATE) AS last_date
+FROM JHU_COVID_19;
+
+
+-- rows by country
+SELECT COUNTRY_REGION, COUNT(*) AS count_num
+FROM JHU_COVID_19
+GROUP BY COUNTRY_REGION
+ORDER BY COUNT(*) DESC
+LIMIT 20;
+
+SELECT
+    COUNTRY_REGION,
+    DATE,
+    CASE_TYPE,
+    COUNT(*) AS rows_per_country_day
+FROM JHU_COVID_19
+GROUP BY COUNTRY_REGION, DATE, CASE_TYPE
+HAVING COUNT(*) > 1
+ORDER BY rows_per_country_day DESC
+LIMIT 20;
+
+
+-- geographical coverage
+SELECT
+    COUNT(DISTINCT COUNTRY_REGION) AS countries,
+    COUNT(DISTINCT PROVINCE_STATE) AS provinces,
+    COUNT(DISTINCT COUNTY) AS counties
+FROM JHU_COVID_19;
+
+
+-- missing values
+SELECT
+    COUNT_IF(COUNTRY_REGION IS NULL) AS null_country,
+    COUNT_IF(PROVINCE_STATE IS NULL) AS null_province,
+    COUNT_IF(COUNTY IS NULL) AS null_county,
+    COUNT_IF(FIPS IS NULL) AS null_fips,
+    COUNT_IF(DATE IS NULL) AS null_date,
+    COUNT_IF(CASE_TYPE IS NULL) AS null_case_type,
+    COUNT_IF(CASES IS NULL) AS null_cases,
+    COUNT_IF(DIFFERENCE IS NULL) AS null_difference,
+    COUNT_IF(LAT IS NULL) AS null_lat,
+    COUNT_IF(LONG IS NULL) AS null_long
+FROM JHU_COVID_19;
+
+
+-- geographical fields
+SELECT COUNTRY_REGION, COUNT(*) AS count_num
+FROM JHU_COVID_19
+WHERE FIPS IS NOT NULL
+GROUP BY COUNTRY_REGION;
+
+SELECT COUNTRY_REGION, COUNTY, COUNT(*) AS count_num
+FROM JHU_COVID_19
+WHERE LAT IS NULL AND LONG IS NULL
+GROUP BY COUNTRY_REGION, COUNTY
+ORDER BY COUNTY ASC;
+
+SELECT COUNTRY_REGION, PROVINCE_STATE, COUNT(*) AS count_num
+FROM JHU_COVID_19
+WHERE LAT IS NULL AND LONG IS NULL
+  AND COUNTRY_REGION != 'United States'
+GROUP BY COUNTRY_REGION, PROVINCE_STATE;
+
+
+-- country totals
+-- MAX(CASES) is not suitable for country totals because countries may contain multiple province/county rows
+SELECT
+    COUNTRY_REGION,
+    MAX(CASES) AS total_cases
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Confirmed'
+GROUP BY COUNTRY_REGION
+ORDER BY total_cases DESC;
+
+
+-- duplicate check
+SELECT
+    DATE,
+    COUNTRY_REGION,
+    PROVINCE_STATE,
+    COUNTY,
+    CASE_TYPE,
+    COUNT(*) AS row_count
+FROM JHU_COVID_19
+GROUP BY
+    DATE,
+    COUNTRY_REGION,
+    PROVINCE_STATE,
+    COUNTY,
+    CASE_TYPE
+HAVING COUNT(*) > 1;
+
+
+-- confirmed cases
+SELECT
+    COUNTRY_REGION,
+    SUM(DIFFERENCE) AS total_cases
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Confirmed'
+GROUP BY COUNTRY_REGION
+ORDER BY total_cases DESC;
+
+SELECT
+    COUNTRY_REGION,
+    COUNT(*) AS num_of_rows,
+    COUNT(DIFFERENCE) AS non_null_differences
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Confirmed'
+GROUP BY COUNTRY_REGION
+ORDER BY non_null_differences;
+
+SELECT
+    COUNTRY_REGION,
+    SUM(DIFFERENCE) AS total_cases
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Confirmed'
+GROUP BY COUNTRY_REGION
+HAVING SUM(DIFFERENCE) IS NOT NULL
+ORDER BY total_cases DESC
+LIMIT 15;
+
+
+-- deaths
+SELECT
+    COUNTRY_REGION,
+    SUM(DIFFERENCE) AS total_cases
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Deaths'
+GROUP BY COUNTRY_REGION
+HAVING SUM(DIFFERENCE) IS NOT NULL
+ORDER BY total_cases DESC
+LIMIT 15;
+
+
+-- recovered
+SELECT
+    COUNTRY_REGION,
+    SUM(DIFFERENCE) AS total_cases
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Recovered'
+GROUP BY COUNTRY_REGION
+HAVING SUM(DIFFERENCE) IS NOT NULL
+ORDER BY total_cases DESC;
+
+SELECT
+    DATE,
+    CASES,
+    DIFFERENCE
+FROM JHU_COVID_19
+WHERE COUNTRY_REGION = 'Argentina'
+  AND CASE_TYPE = 'Recovered'
+ORDER BY DATE DESC
+LIMIT 30;
+
+SELECT
+    COUNTRY_REGION,
+    SUM(DIFFERENCE) AS total_recovered
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Recovered'
+  AND DIFFERENCE > 0
+GROUP BY COUNTRY_REGION
+ORDER BY total_recovered DESC
+LIMIT 20;
+
+-- total confirmed cases by month
+SELECT
+    DATE_TRUNC('MONTH', DATE) AS month,
+    SUM(DIFFERENCE) AS new_cases
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Confirmed'
+GROUP BY month
+ORDER BY month;
+
+-- rolling mean of new cases
+WITH daily_cases AS (
+    SELECT
+        DATE,
+        COUNTRY_REGION,
+        SUM(DIFFERENCE) AS new_cases
+    FROM JHU_COVID_19
+    WHERE CASE_TYPE = 'Confirmed'
+    GROUP BY DATE, COUNTRY_REGION
+)
+
+SELECT
+    DATE,
+    COUNTRY_REGION,
+    new_cases,
+    AVG(new_cases) OVER (
+        PARTITION BY COUNTRY_REGION
+        ORDER BY DATE
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS avg_7_day_cases
+FROM daily_cases
+WHERE COUNTRY_REGION = 'Lithuania'
+ORDER BY COUNTRY_REGION, DATE;
+
+
+-- rolling mean of deaths
+WITH daily_cases AS (
+    SELECT
+        DATE,
+        COUNTRY_REGION,
+        SUM(DIFFERENCE) AS new_deaths
+    FROM JHU_COVID_19
+    WHERE CASE_TYPE = 'Deaths'
+    GROUP BY DATE, COUNTRY_REGION
+)
+
+SELECT
+    DATE,
+    COUNTRY_REGION,
+    new_deaths,
+    AVG(new_deaths) OVER (
+        PARTITION BY COUNTRY_REGION
+        ORDER BY DATE
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS avg_7_day_deaths
+FROM daily_cases
+WHERE COUNTRY_REGION = 'Lithuania'
+ORDER BY COUNTRY_REGION, DATE;
+
+
+SELECT
+    DATE_TRUNC('MONTH', DATE) AS month,
+    SUM(DIFFERENCE) AS new_cases
+FROM JHU_COVID_19
+WHERE CASE_TYPE = 'Confirmed'
+GROUP BY month
+ORDER BY month;
