@@ -1,2 +1,4 @@
 .*csv filter=lfs diff=lfs merge=lfs -text
 .*docx filter=lfs diff=lfs merge=lfs -text
+*.csv filter=lfs diff=lfs merge=lfs -text
+report.docx filter=lfs diff=lfs merge=lfs -text
