@@ -1,3 +1,4 @@
 pandas
 pyspark
 python-dotenv
+pymongo
