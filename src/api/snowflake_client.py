@@ -187,3 +187,29 @@ def get_gdp_analysis(year):
     connection.close()
 
     return rows
+
+def get_country_comparison(year):
+    connection = get_snowflake_connection()
+    cursor = connection.cursor()
+
+    query = """
+        SELECT
+            COUNTRY_REGION,
+            POPULATION,
+            POPULATION_DENSITY,
+            GDP_PER_CAPITA,
+            CASES_PER_100K,
+            DEATHS_PER_100K,
+            CASE_FATALITY_RATE
+        FROM COVID_DEMOGRAPHIC_ANALYSIS
+        WHERE YEAR = %s
+          AND POPULATION IS NOT NULL
+    """
+
+    cursor.execute(query, (year,))
+    rows = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return rows

@@ -8,7 +8,8 @@ from src.api.snowflake_client import (
     get_top_cases,
     get_top_deaths,
     get_density_analysis,
-    get_gdp_analysis
+    get_gdp_analysis,
+    get_country_comparison
 )
 from src.nosql.mongodb import create_annotation, get_annotations, update_annotation, delete_annotation
 
@@ -139,6 +140,23 @@ def gdp_analysis(year: int):
             "gdp_quartile": row[0],
             "avg_cases_per_100k": row[1],
             "avg_deaths_per_100k": row[2]
+        }
+        for row in rows
+    ]
+
+@app.get("/analytics/comparison/{year}")
+def country_comparison(year: int):
+    rows = get_country_comparison(year)
+
+    return [
+        {
+            "country": row[0],
+            "population": row[1],
+            "population_density": row[2],
+            "gdp_per_capita": row[3],
+            "cases_per_100k": row[4],
+            "deaths_per_100k": row[5],
+            "case_fatality_rate": row[6]
         }
         for row in rows
     ]
