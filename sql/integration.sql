@@ -87,7 +87,7 @@ SELECT
 FROM COVID_ANALYTICS.ANALYTICS.COVID_DEMOGRAPHIC_ANALYSIS;
 
 -- aggregate by year and quartile to distinguish between countries 
--- with different levels of population density 
+-- with different levels of population density or gdp
 SELECT
     YEAR,
     DENSITY_QUARTILE,
@@ -104,3 +104,13 @@ SELECT
 FROM ANALYTICS.COVID_DEMOGRAPHIC_ANALYSIS
 GROUP BY YEAR, GDP_QUARTILE
 ORDER BY YEAR, GDP_QUARTILE;
+
+-- countries with highest deaths per 100000 people
+SELECT
+    COUNTRY_REGION,
+    DEATHS_PER_100K
+FROM COVID_DEMOGRAPHIC_ANALYSIS
+WHERE YEAR = 2020
+  AND DEATHS_PER_100K IS NOT NULL
+ORDER BY DEATHS_PER_100K DESC
+LIMIT 10
