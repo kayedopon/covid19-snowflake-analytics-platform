@@ -152,7 +152,7 @@ def main():
     plt.xticks(rotation=45)
     plt.tight_layout()
 
-    plt.savefig(OUTPUT_DIR / "validation_forecast.png", dpi=200)
+    plt.savefig(OUTPUT_DIR / "validation_forecast.png")
     plt.close()
 
 
@@ -173,7 +173,7 @@ def main():
     plt.title("XGBoost Feature Importance")
     plt.tight_layout()
 
-    plt.savefig(OUTPUT_DIR / "feature_importance.png", dpi=200)
+    plt.savefig(OUTPUT_DIR / "feature_importance.png")
     plt.close()
 
 
@@ -215,7 +215,7 @@ def main():
     plt.xticks(rotation=45)
     plt.tight_layout()
 
-    plt.savefig(OUTPUT_DIR / "future_forecast.png", dpi=200)
+    plt.savefig(OUTPUT_DIR / "future_forecast.png")
     plt.close()
 
     print("\nFuture forecast:")
