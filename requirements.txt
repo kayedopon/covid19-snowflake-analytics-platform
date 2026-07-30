@@ -8,3 +8,7 @@ uvicorn
 dash 
 plotly 
 requests
+xgboost
+scikit-learn
+matplotlib
+prophet
