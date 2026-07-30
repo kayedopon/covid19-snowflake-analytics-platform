@@ -62,13 +62,13 @@ def main():
         max_k=MAX_K
     )
 
-    best_k = 2
+    # final clusterin on k that I think is the best
 
+    best_k = 2
 
     _, labels = fit_kmeans(X_scaled, best_k)
 
     clustering_df["cluster"] = labels
-
     clustering_df.to_csv(folders["data"] / "country_clusters.csv", index=False)
 
     print("\nCluster sizes:")
@@ -83,12 +83,10 @@ def main():
         print(", ".join(countries))
 
     cluster_summary = clustering_df.groupby("cluster")[feature_columns].mean()
-
     cluster_summary.to_csv(folders["data"] / "cluster_summary.csv")
 
     print("\nCluster averages:")
     print(cluster_summary)
-
     print(f"\nOutputs saved to {OUTPUT_DIR}")
 
 
