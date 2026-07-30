@@ -2,3 +2,6 @@ pandas
 pyspark
 python-dotenv
 pymongo
+snowflake-connector-python
+fastapi
+uvicorn
