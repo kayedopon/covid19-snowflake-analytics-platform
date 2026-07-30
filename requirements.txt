@@ -5,3 +5,6 @@ pymongo
 snowflake-connector-python
 fastapi
 uvicorn
+dash 
+plotly 
+requests
