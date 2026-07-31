@@ -8,18 +8,17 @@ from pymongo import MongoClient
 
 load_dotenv()
 
-username = os.getenv("MONGO_USER")
-password = os.getenv("MONGO_PASSWORD")
-host = os.getenv("MONGO_HOST")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+MONGO_DATABASE = os.getenv("MONGO_DATABASE", "covid_analytics")
 
-mongo_uri = (
-    f"mongodb+srv://{username}:{password}@{host}/"
-    f"?appName=Cluster0"
+client = MongoClient(
+    MONGO_URI,
+    serverSelectionTimeoutMS=5000
 )
 
-client = MongoClient(mongo_uri)
+client = MongoClient(MONGO_URI)
 
-db = client["covid_analytics"]
+db = client[MONGO_DATABASE]
 annotations = db["annotations"]
 
 def create_annotation(country, year, metric, comment, author="anonymous"):

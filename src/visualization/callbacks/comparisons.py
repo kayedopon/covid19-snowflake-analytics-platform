@@ -91,49 +91,33 @@ def register_comparison_callbacks(app):
             "value"
         )
     )
+    @app.callback(
+    Output("top-deaths-chart", "figure"),
+    Input("year-dropdown", "value"),
+    Input("limit-dropdown", "value")
+)
     def update_top_deaths(year, limit):
+        data = get_top_deaths(year, limit)
 
-        data = get_top_deaths(
-            year,
-            limit
-        )
+        countries = [row["country"] for row in data]
+        values = [float(row["deaths_per_100k"]) for row in data]
 
         figure = go.Figure(
             go.Bar(
-                x=[
-                    row["deaths_per_100k"]
-                    for row in data
-                ],
-                y=[
-                    row["country"]
-                    for row in data
-                ],
+                x=values,
+                y=countries,
                 orientation="h"
             )
         )
 
         figure.update_layout(
-            title=(
-                f"Top {limit} countries "
-                f"by deaths per 100k ({year})"
-            ),
+            title=f"Top {limit} countries by deaths per 100k ({year})",
             xaxis_title="Deaths per 100,000",
             yaxis_title="Country",
             template="plotly_white",
-            height=max(
-                400,
-                limit * 35
-            ),
-            margin=dict(
-                l=40,
-                r=20,
-                t=60,
-                b=40
-            ),
-            yaxis={
-                "categoryorder":
-                    "total ascending"
-            }
+            height=max(400, limit * 35),
+            margin=dict(l=40, r=20, t=60, b=40),
+            yaxis={"categoryorder": "total ascending"}
         )
 
         return figure

@@ -12,4 +12,3 @@ scikit-learn
 matplotlib
 prophet
 redis
-requests
