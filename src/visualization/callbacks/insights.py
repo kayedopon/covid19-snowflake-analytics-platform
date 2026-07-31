@@ -57,10 +57,12 @@ def register_insight_callbacks(app):
     @app.callback(
         Output("country-global-cases-chart", "figure"),
         Output("country-global-deaths-chart", "figure"),
+
         Input("country-dropdown", "value"),
-        Input("year-dropdown", "value")
+        Input("year-dropdown", "value"),
+        Input("url", "pathname")
     )
-    def update_global_comparison(country, year):
+    def update_global_comparison(country, year, pathname):
         country_response = get_country_year(country, year)
         comparison_data = get_comparison(year)
 
@@ -69,18 +71,20 @@ def register_insight_callbacks(app):
 
         country_data = country_response.json()
 
-        country_cases = country_data.get("cases_per_100k")
-        country_deaths = country_data.get("deaths_per_100k")
-
-        global_cases = calculate_global_rate(
-            comparison_data,
-            "cases_per_100k"
+        country_cases = (
+            float(country_data["cases_per_100k"])
+            if country_data.get("cases_per_100k") is not None
+            else None
         )
 
-        global_deaths = calculate_global_rate(
-            comparison_data,
-            "deaths_per_100k"
+        country_deaths = (
+            float(country_data["deaths_per_100k"])
+            if country_data.get("deaths_per_100k") is not None
+            else None
         )
+
+        global_cases = calculate_global_rate(comparison_data, "cases_per_100k")
+        global_deaths = calculate_global_rate(comparison_data, "deaths_per_100k")
 
         cases_figure = go.Figure(
             go.Bar(
@@ -115,10 +119,12 @@ def register_insight_callbacks(app):
 
     @app.callback(
         Output("world-map", "figure"),
+
         Input("year-dropdown", "value"),
-        Input("map-metric-dropdown", "value")
+        Input("map-metric-dropdown", "value"),
+        Input("url", "pathname")
     )
-    def update_world_map(year, metric):
+    def update_world_map(year, metric, pathname):
         data = get_comparison(year)
 
         clean_data = [
