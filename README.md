@@ -44,7 +44,6 @@ You need:
 - Docker
 - Docker Compose
 - access to Snowflake
-- access to MongoDB Atlas
 
 Check Docker:
 
