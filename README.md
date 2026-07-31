@@ -73,7 +73,6 @@ REDIS_PORT=6379
 REDIS_TTL=500
 ```
 
-Do not upload `.env` to GitHub.
 
 When the application runs through Docker Compose, the API service connects to Redis using the Docker service name `redis`.
 
@@ -90,6 +89,7 @@ This starts:
 - FastAPI
 - Dash dashboard
 - Redis
+- MongoDB
 
 To start everything in the background:
 
