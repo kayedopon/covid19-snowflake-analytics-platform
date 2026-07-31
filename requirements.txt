@@ -1,5 +1,4 @@
 pandas
-pyspark
 python-dotenv
 pymongo
 snowflake-connector-python
