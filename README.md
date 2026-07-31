@@ -8,6 +8,7 @@ This project combines COVID-19 data from Snowflake with demographic data and pro
 - MongoDB annotations
 - Forecasting with XGBoost and Prophet
 - Country clustering
+- Data processing with Pyspark
 - Snowflake optimization experiments
 
 ## Project Structure
