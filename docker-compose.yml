@@ -54,6 +54,19 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+  
+  ingestion:
+    build:
+      context: .
+      dockerfile: Dockerfile.ingestion
+    container_name: covid-ingestion
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+    profiles:
+      - ingestion
 
 volumes:
   mongodb_data:

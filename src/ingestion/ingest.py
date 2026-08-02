@@ -1,17 +1,17 @@
 from pathlib import Path
 
-from spark_session import get_session
-from transform_external import (
+from .spark_session import get_session
+from .transform_external import (
     load_external_data,
     prepare_population,
     prepare_gdp,
     prepare_density,
     merge_external_data
 )
-from validate_external import validate_external_data
-from snowflake_writer import write_to_snowflake
+from .validate_external import validate_external_data
+from .snowflake_writer import write_to_snowflake
 
-from country_norm import normalize_country_names
+from .country_norm import normalize_country_names
 
 
 spark = get_session()
