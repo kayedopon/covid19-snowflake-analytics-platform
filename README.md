@@ -26,7 +26,8 @@ COVID19-SNOWFLAKE-ANALYTICS-PLATFORM/
 ├── sql/
 │   ├── EDA.sql
 │   ├── integration.sql
-│   └── optimization.sql
+│   ├── optimization.sql
+│   └── patterns.sql
 ├── src/
 │   ├── api/
 │   ├── clustering/
